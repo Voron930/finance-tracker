@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"net/http"
 
+	"finance-tracker/internal/app"
 	"finance-tracker/internal/config"
 	"finance-tracker/internal/db"
 )
@@ -19,5 +21,15 @@ func main() {
 	}
 	defer dbPool.Close()
 
-	log.Println("Application started")
+	router := app.NewRouter()
+
+	server := &http.Server{
+		Addr:    ":" + cfg.AppPort,
+		Handler: router,
+	}
+
+	log.Printf("server started on :%s", cfg.AppPort)
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatalf("server failed: %v", err)
+	}
 }
